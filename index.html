@@ -1,110 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Directory</title>
-    <style>
-        body {
-            font-family: 'Times New Roman';
-            text-align: center;
-            margin-top: 30px;
-        }
-        table {
-            margin-left: auto;
-            margin-right: auto;
-            /* border-collapse: collapse; */
-            width: 100%;
-        }
-        th, td {
-            padding: 5px;
-            border-style: outset;
-        }
-        input {
-            margin-bottom: 20px;
-            padding: 1px;
-            width: 50%;
-        }
-        a {
-            color: #007BFF;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Page Title</title>
+    <link rel='stylesheet' href='main.css'>
 </head>
 <body>
-
-    <h2>assets/midi</h2>
-
-    <input type="text" id="fileSearch" onkeyup="filterFiles()" placeholder="Search for files...">
-
-    <table id="fileTable">
-        <thead>
-            <tr>
-                <th>File Name</th>
-                <th>Size</th>
-            </tr>
-        </thead>
-        <tbody id="fileList">
-            </tbody>
-    </table>
-
-    <script>
-        // GitHub repository details
-        const username = 'Official3Gamer';
-        const repo = 'My-Midis';
-        const folderPath = 'assets/midi';
-
-        const apiURL = `https://api.github.com/repos/${username}/${repo}/contents/${folderPath}`;
-
-        async function fetchFiles() {
-            try {
-                const response = await fetch(apiURL);
-                const files = await response.json();
-                const tableBody = document.getElementById('fileList');
-
-                files.forEach(file => {
-                    if (file.type === 'file') {
-                        const row = document.createElement('tr');
-                        
-                        // Convert bytes to readable format
-                        const sizeFormatted = formatSize(file.size);
-
-                        row.innerHTML = `
-                            <td><a href="${file.download_url}">${file.name}</a></td>
-                            <td>${sizeFormatted}</td>
-                        `;
-                        tableBody.appendChild(row);
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching files:', error);
-            }
-        }
-
-        function formatSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-        }
-
-        function filterFiles() {
-            const input = document.getElementById('fileSearch');
-            const filter = input.value.toLowerCase();
-            const rows = document.getElementById('fileList').getElementsByTagName('tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                const text = rows[i].getElementsByTagName('td')[0].textContent;
-                rows[i].style.display = text.toLowerCase().includes(filter) ? "" : "none";
-            }
-        }
-
-        fetchFiles();
-    </script>
-
+    <h1>Sorry i got lazy here is the only page for now</h1>
+    <a href="midi.html">MIDI FILES</a>
 </body>
 </html>
