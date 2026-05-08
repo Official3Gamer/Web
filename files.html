@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Directory</title>
+    <style>
+        body {
+            font-family: 'Times New Roman';
+            text-align: center;
+            margin-top: 30px;
+        }
+        table {
+            margin-left: auto;
+            margin-right: auto;
+            /* border-collapse: collapse; */
+            width: 100%;
+        }
+        th, td {
+            padding: 5px;
+            border-style: outset;
+        }
+        input {
+            margin-bottom: 20px;
+            padding: 1px;
+            width: 50%;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h2 id="currentPath">[Loading Name]</h2>
+
+    <button id="backBtn" onclick="goBack()" style="display:none;">Back</button>
+
+    <input type="text" id="fileSearch" onkeyup="filterFiles()" placeholder="Search for files...">
+
+    <table id="fileTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+            </tr>
+        </thead>
+        <tbody id="fileList">
+            </tbody>
+    </table>
+
+    <script>
+        // GitHub repository details
+        const username = 'Official3Gamer';
+        const repo = 'Web';
+        let currentPath = 'assets';
+
+        function getPathFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('path') || 'assets';
+        }
+
+        async function updateTable(path) {
+            try {
+                const apiURL = `https://api.github.com/repos/${username}/${repo}/contents/${path}`;
+                const response = await fetch(apiURL);
+                const files = await response.json();
+                const tableBody = document.getElementById('fileList');
+                const pathDisplay = document.getElementById('currentPath');
+                const backBtn = document.getElementById('backBtn');
+                const searchInput = document.getElementById('fileSearch');
+
+                // Clear table
+                tableBody.innerHTML = '';
+                // Clear search
+                searchInput.value = '';
+
+                // Update current path
+                currentPath = path;
+
+                // Update path display
+                pathDisplay.textContent = path;
+
+                // Update URL
+                history.pushState(null, '', `?path=${encodeURIComponent(path)}`);
+
+                // Show/hide back button
+                backBtn.style.display = path === 'assets' ? 'none' : 'inline-block';
+
+                files.forEach(file => {
+                    const row = document.createElement('tr');
+                    const sizeFormatted = file.type === 'file' ? formatSize(file.size) : '';
+                    let nameCell;
+                    if (file.type === 'file') {
+                        nameCell = `<td><a href="${file.download_url}" target="_blank">${file.name}</a></td>`;
+                    } else {
+                        nameCell = `<td><a href="#" onclick="updateTable('${file.path}'); return false;">${file.name}/</a></td>`;
+                    }
+                    row.innerHTML = `
+                        ${nameCell}
+                        <td>${sizeFormatted}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching files:', error);
+                // Optionally, show an error message to the user
+                alert('Failed to load directory contents. Please try again.');
+            }
+        }
+
+        function goBack() {
+            const pathParts = currentPath.split('/');
+            if (pathParts.length > 1) {
+                pathParts.pop();
+                const newPath = pathParts.join('/');
+                updateTable(newPath);
+            }
+        }
+
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function filterFiles() {
+            const input = document.getElementById('fileSearch');
+            const filter = input.value.toLowerCase();
+            const rows = document.getElementById('fileList').getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const text = rows[i].getElementsByTagName('td')[0].textContent;
+                rows[i].style.display = text.toLowerCase().includes(filter) ? "" : "none";
+            }
+        }
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', () => {
+            updateTable(getPathFromURL());
+        });
+
+        // Initial load
+        updateTable(getPathFromURL());
+    </script>
+
+</body>
+</html>
